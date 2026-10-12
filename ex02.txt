@@ -1,0 +1,13 @@
+Phần 1: Phân tích sai lầm của An
+Bản chất lệnh của An (Get-ChildItem): Get-ChildItem (tương đương với lệnh dir hoặc ls) là lệnh dùng để liệt kê danh sách file và thư mục. Tham số -Filter "*404*" chỉ tìm kiếm các tên file có chứa chuỗi "404" (ví dụ: baocao_404.txt), chứ không hề can thiệp hay đọc nội dung bên trong file.
+Nguyên nhân kết quả trống rỗng: File log thực tế (như access.log) có tên hoàn toàn bình thường, còn lỗi 404 lại nằm ẩn bên trong nội dung của file đó. Do đó, Get-ChildItem hoàn toàn lực bất tòng tâm.
+Công cụ đúng (Select-String): Để tìm kiếm từ khóa hoặc văn bản bên trong nội dung file (tương đương với lệnh grep trên hệ thống Linux), PowerShell cung cấp lệnh chuyên dụng là Select-String.
+Phần 2: Sửa lỗi và câu lệnh chuẩn
+Để lọc các dòng chứa chữ "ERROR" (hoặc kết hợp cả lỗi 404) từ file access.log kèm theo số dòng để kỹ sư dễ dàng tra cứu, An sử dụng câu lệnh chuẩn sau:
+1. Lọc các dòng chứa chữ "ERROR"
+PowerShell
+Select-String -Path "access.log" -Pattern "ERROR"
+2. Lọc các dòng chứa cả "ERROR" và "404" (Theo yêu cầu của bối cảnh)
+PowerShell
+Select-String -Path "access.log" -Pattern "ERROR.*404|404.*ERROR"
+Điểm nổi bật: Mặc định, lệnh Select-String trong PowerShell đã tự động hiển thị số dòng (LineNumber) cùng với tên file và nội dung dòng khớp kết quả. Kỹ sư có thể dựa ngay vào số dòng này để mở file và xử lý sự cố nhanh chóng.
